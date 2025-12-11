@@ -4,6 +4,8 @@ const all_tabs       = document.getElementById("all_tabs");
 const fileInput      = document.getElementById("fileInput");
 const fileNameInput  = document.getElementById("file_name");
 const outputRadios   = document.querySelectorAll('input[name="output_mode"]');
+const themeSelect    = document.getElementById("theme-select");
+const statusMessage  = document.getElementById("status-message");
 let textFile = null;
 
 // keep the same injected style for .tab-item/.tab-label
@@ -23,7 +25,69 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// disable filename input when “Copy to Clipboard” is selected
+// Theme switching functionality
+function applyTheme(theme) {
+  // Remove all theme classes
+  document.body.classList.remove('theme-light-blue');
+  
+  // Apply selected theme
+  if (theme === 'light-blue') {
+    document.body.classList.add('theme-light-blue');
+  }
+  
+  // Save theme preference
+  chrome.storage.local.set({ theme: theme });
+}
+
+function loadTheme() {
+  // Load saved theme preference, default to 'cyberpunk'
+  chrome.storage.local.get(['theme'], function(result) {
+    const savedTheme = result.theme || 'cyberpunk';
+    themeSelect.value = savedTheme;
+    applyTheme(savedTheme);
+  });
+}
+
+// Theme selector event listener
+if (themeSelect) {
+  themeSelect.addEventListener('change', () => {
+    applyTheme(themeSelect.value);
+  });
+}
+
+// Initialize theme on page load
+loadTheme();
+
+// Status message functionality
+function showStatusMessage(message, type = 'info') {
+  // Clear any existing timeout
+  if (window.statusMessageTimeout) {
+    clearTimeout(window.statusMessageTimeout);
+  }
+  
+  // Set message and type
+  statusMessage.textContent = message;
+  statusMessage.className = 'status-message show ' + type;
+  
+  // Hide after 3 seconds
+  window.statusMessageTimeout = setTimeout(() => {
+    statusMessage.classList.remove('show');
+    // Clear text after fade out
+    setTimeout(() => {
+      statusMessage.textContent = '';
+      statusMessage.className = 'status-message';
+    }, 300);
+  }, 3000);
+}
+
+function showCopyingStatus() {
+  const mode = document.querySelector('input[name="output_mode"]:checked').value;
+  if (mode === 'clipboard') {
+    showStatusMessage('Copying to clipboard...', 'info');
+  }
+}
+
+// disable filename input when "Copy to Clipboard" is selected
 outputRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     const isClipboard = radio.value === 'clipboard';
@@ -86,9 +150,21 @@ function downloadTabs(tabs, file_name) {
 // helper to copy URLs to clipboard
 function copyToClipboard(tabs) {
   const text = tabs.map(t => t.url).join('\n');
-  navigator.clipboard.writeText(text)
-    .then(() => console.log('URLs copied to clipboard'))
-    .catch(err => console.error('Copy failed', err));
+  
+  // Show copying status
+  showCopyingStatus();
+  
+  return navigator.clipboard.writeText(text)
+    .then(() => {
+      console.log('URLs copied to clipboard');
+      showStatusMessage('Copied to clipboard!', 'success');
+      return true;
+    })
+    .catch(err => {
+      console.error('Copy failed', err);
+      showStatusMessage('Copy failed. Please try again.', 'error');
+      return false;
+    });
 }
 
 // export selected tabs
@@ -97,8 +173,19 @@ function dump() {
   const selected = Array.from(document.querySelectorAll('input[name="tabs"]:checked'))
     .map(cb => JSON.parse(cb.value));
 
+  // Check if any tabs are selected for clipboard mode
+  if (mode === 'clipboard' && selected.length === 0) {
+    showStatusMessage('No tabs selected. Please select at least one tab.', 'error');
+    return;
+  }
+
   if (mode === 'file') {
+    if (!fileNameInput.value.trim()) {
+      showStatusMessage('Please enter a filename to save.', 'error');
+      return;
+    }
     downloadTabs(selected, fileNameInput.value);
+    showStatusMessage('Download started...', 'info');
   } else {
     copyToClipboard(selected);
   }
@@ -107,9 +194,16 @@ function dump() {
 // export all tabs
 function dumpAll() {
   const mode = document.querySelector('input[name="output_mode"]:checked').value;
+  
+  if (mode === 'file' && !fileNameInput.value.trim()) {
+    showStatusMessage('Please enter a filename to save.', 'error');
+    return;
+  }
+  
   chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT}, tabs => {
     if (mode === 'file') {
       downloadTabs(tabs, fileNameInput.value);
+      showStatusMessage('Download started...', 'info');
     } else {
       copyToClipboard(tabs);
     }

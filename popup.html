@@ -10,6 +10,18 @@
   <body>
     <div class="container">
       <div class="title">RDUMP</div>
+      
+      <!-- Theme selector -->
+      <div class="theme-selector" style="margin-bottom: 15px;">
+        <label>
+          Theme:
+          <select id="theme-select">
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="light-blue">Light Blue</option>
+          </select>
+        </label>
+      </div>
+
       <div id="all_tabs"></div>
 
       <!-- output-mode toggle -->
@@ -29,6 +41,8 @@
         <button id="dmp_btn">EXPORT_SELECTED</button>
         <button id="dmp_all_btn">EXPORT_ALL</button>
       </div>
+      
+      <div id="status-message" class="status-message"></div>
 
       <div class="divider">OR</div>
       <div class="import-label">IMPORT LIST OF URLs</div>

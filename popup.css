@@ -7,6 +7,21 @@
   --checkbox-color: #ff5500;
 }
 
+/* Light Blue Theme Variables */
+.theme-light-blue {
+  --primary-color: #0077cc;
+  --secondary-color: #66aaff;
+  --background-color: #f0f8ff;
+  --text-color: #333333;
+  --border-color: #aaddff;
+  --accent-color: #0055aa;
+  --button-bg: #0077cc;
+  --button-hover: #0055aa;
+  --scrollbar-thumb: #66aaff;
+  --scrollbar-track: #e6f2ff;
+  --grid-color-light: rgba(102, 170, 255, 0.1);
+}
+
 body {
   font-family: "Consolas", "Monaco", "Lucida Console", "SF Mono", "Roboto Mono", "Courier New", monospace;
   background-color: var(--dark-bg);
@@ -327,4 +342,214 @@ input[type="text"]:disabled {
 }
 input[type="text"]:disabled::placeholder {
   color: rgba(150, 150, 150, 0.5);
+}
+
+/* Light Blue Theme Styles */
+body.theme-light-blue {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  text-shadow: none;
+  background-image: 
+    linear-gradient(var(--grid-color-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color-light) 1px, transparent 1px);
+}
+
+body.theme-light-blue .container {
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 10px rgba(0, 119, 204, 0.2), inset 0 0 5px rgba(102, 170, 255, 0.1);
+}
+
+body.theme-light-blue .container::before {
+  color: var(--accent-color);
+}
+
+body.theme-light-blue .container::after {
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+}
+
+body.theme-light-blue #all_tabs {
+  border: 1px solid rgba(102, 170, 255, 0.3);
+  background-color: rgba(240, 248, 255, 0.9);
+}
+
+body.theme-light-blue #all_tabs::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+body.theme-light-blue #all_tabs::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+}
+
+body.theme-light-blue .tab-item {
+  border-bottom: 1px solid rgba(0, 119, 204, 0.2);
+}
+
+body.theme-light-blue .tab-label {
+  color: var(--text-color);
+}
+
+body.theme-light-blue input[type="checkbox"] {
+  border: 1px solid var(--accent-color);
+}
+
+body.theme-light-blue input[type="checkbox"]:checked {
+  background-color: rgba(0, 119, 204, 0.2);
+}
+
+body.theme-light-blue input[type="checkbox"]:checked::before {
+  color: var(--accent-color);
+}
+
+body.theme-light-blue input[type="text"] {
+  background-color: rgba(240, 248, 255, 0.9);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+body.theme-light-blue input[type="text"]::placeholder {
+  color: rgba(102, 170, 255, 0.5);
+}
+
+body.theme-light-blue input[type="text"]:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 8px rgba(0, 119, 204, 0.2);
+}
+
+body.theme-light-blue input[type="text"]:disabled {
+  background-color: rgba(230, 242, 255, 0.5);
+  color: rgba(100, 100, 100, 0.7);
+  border-color: rgba(170, 221, 255, 0.5);
+}
+
+body.theme-light-blue button {
+  background-color: var(--button-bg);
+  border: 1px solid var(--border-color);
+  color: white;
+}
+
+body.theme-light-blue button:hover {
+  background-color: var(--button-hover);
+  border-color: var(--accent-color);
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 85, 170, 0.3);
+}
+
+body.theme-light-blue button::after {
+  background: linear-gradient(90deg, transparent, white, transparent);
+}
+
+body.theme-light-blue .divider {
+  color: var(--accent-color);
+}
+
+body.theme-light-blue .divider::before,
+body.theme-light-blue .divider::after {
+  background-color: rgba(102, 170, 255, 0.3);
+}
+
+body.theme-light-blue #fileInput {
+  background-color: rgba(240, 248, 255, 0.9);
+  border: 1px dashed var(--border-color);
+  color: var(--text-color);
+}
+
+body.theme-light-blue #fileInput:hover {
+  border-color: var(--primary-color);
+}
+
+body.theme-light-blue hr {
+  border-top: 1px dashed rgba(102, 170, 255, 0.2);
+}
+
+body.theme-light-blue .title {
+  color: var(--accent-color);
+}
+
+body.theme-light-blue .title::before {
+  color: var(--secondary-color);
+}
+
+body.theme-light-blue .title::after {
+  color: var(--primary-color);
+}
+
+body.theme-light-blue .import-label {
+  color: var(--accent-color);
+}
+
+/* Theme selector styles */
+.theme-selector {
+  margin-bottom: 15px;
+  padding: 5px 10px;
+  background-color: rgba(10, 10, 18, 0.7);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 5px;
+  color: var(--neon-cyan);
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body.theme-light-blue .theme-selector {
+  background-color: rgba(240, 248, 255, 0.9);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+/* Status message styles */
+.status-message {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  min-height: 20px;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.status-message.show {
+  opacity: 1;
+  max-height: 50px;
+  margin-top: 10px;
+}
+
+.status-message.success {
+  color: var(--terminal-green);
+  background-color: rgba(0, 255, 140, 0.1);
+  border: 1px solid var(--terminal-green);
+}
+
+.status-message.error {
+  color: #ff5555;
+  background-color: rgba(255, 85, 85, 0.1);
+  border: 1px solid #ff5555;
+}
+
+.status-message.info {
+  color: var(--neon-cyan);
+  background-color: rgba(0, 240, 255, 0.1);
+  border: 1px solid var(--neon-cyan);
+}
+
+/* Light theme adjustments */
+body.theme-light-blue .status-message.success {
+  color: #00aa00;
+  background-color: rgba(0, 170, 0, 0.1);
+  border: 1px solid #00aa00;
+}
+
+body.theme-light-blue .status-message.error {
+  color: #cc0000;
+  background-color: rgba(204, 0, 0, 0.1);
+  border: 1px solid #cc0000;
+}
+
+body.theme-light-blue .status-message.info {
+  color: var(--primary-color);
+  background-color: rgba(0, 119, 204, 0.1);
+  border: 1px solid var(--primary-color);
 }
