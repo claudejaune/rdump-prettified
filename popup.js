@@ -96,8 +96,8 @@ outputRadios.forEach(radio => {
     fileNameInput.disabled = isClipboard;
 
     // 2) swap button text
-    dmp_btn.textContent     = isClipboard ? 'COPY_SELECTED' : 'EXPORT_SELECTED';
-    dmp_all_btn.textContent = isClipboard ? 'COPY_ALL'      : 'EXPORT_ALL';
+    dmp_btn.textContent     = isClipboard ? 'COPY SELECTED' : 'EXPORT SELECTED';
+    dmp_all_btn.textContent = isClipboard ? 'COPY ALL'      : 'EXPORT ALL';
   });
 });
 

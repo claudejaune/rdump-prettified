@@ -189,6 +189,9 @@ button {
   text-transform: uppercase;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 button:hover {
