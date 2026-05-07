@@ -124,7 +124,6 @@ chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT}, tabs => {
     tabItem.appendChild(checkbox);
     tabItem.appendChild(label);
     all_tabs.appendChild(tabItem);
-    all_tabs.appendChild(document.createElement('hr'));
   });
 });
 
