@@ -347,11 +347,9 @@ input[type="text"]:disabled::placeholder {
 /* Light Blue Theme Styles */
 body.theme-light-blue {
   background-color: var(--background-color);
+  background-image: none;
   color: var(--text-color);
   text-shadow: none;
-  background-image: 
-    linear-gradient(var(--grid-color-light) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-color-light) 1px, transparent 1px);
 }
 
 body.theme-light-blue .container {
@@ -364,7 +362,7 @@ body.theme-light-blue .container::before {
 }
 
 body.theme-light-blue .container::after {
-  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  display: none;
 }
 
 body.theme-light-blue #all_tabs {
