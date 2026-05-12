@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>RDUMP_v0.5</title>
+    <title>RDUMP_v0.6</title>
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
@@ -24,16 +24,22 @@
 
       <div id="all_tabs"></div>
 
-      <!-- output-mode toggle -->
-      <div id="output-mode" style="margin-bottom: 15px;">
-        <label>
-          <input type="radio" name="output_mode" value="file" checked>
-          Save to File
-        </label>
-        <label style="margin-left: 10px;">
-          <input type="radio" name="output_mode" value="clipboard">
-          Copy to Clipboard
-        </label>
+      <!-- separator toggle -->
+      <div class="option-toggle" id="separator-toggle">
+        <span class="toggle-corner-label">Separator</span>
+        <span class="option-opt active" data-value="newline">Newline</span>
+        <span class="toggle-arrow"></span>
+        <span class="option-opt inactive" data-value="space">Space</span>
+        <input type="radio" name="separator" value="newline" checked style="display:none">
+      </div>
+
+      <!-- output mode toggle -->
+      <div class="option-toggle" id="output-toggle">
+        <span class="toggle-corner-label">URL List</span>
+        <span class="option-opt active" data-value="file">Save</span>
+        <span class="toggle-arrow"></span>
+        <span class="option-opt inactive" data-value="clipboard">Copy</span>
+        <input type="radio" name="output_mode" value="file" checked style="display:none">
       </div>
 
       <input id="file_name" type="text" value="rdump-tabs.txt" placeholder="DEST_FILENAME (REQUIRED IF SAVING TO FILE)" required/>

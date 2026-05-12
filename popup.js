@@ -3,7 +3,8 @@ const dmp_btn        = document.getElementById("dmp_btn");
 const all_tabs       = document.getElementById("all_tabs");
 const fileInput      = document.getElementById("fileInput");
 const fileNameInput  = document.getElementById("file_name");
-const outputRadios   = document.querySelectorAll('input[name="output_mode"]');
+const outputToggle   = document.getElementById("output-toggle");
+const separatorToggle = document.getElementById("separator-toggle");
 const themeSelect    = document.getElementById("theme-select");
 const statusMessage  = document.getElementById("status-message");
 let textFile = null;
@@ -87,18 +88,57 @@ function showCopyingStatus() {
   }
 }
 
-// disable filename input when "Copy to Clipboard" is selected
-outputRadios.forEach(radio => {
-  radio.addEventListener('change', () => {
-    const isClipboard = radio.value === 'clipboard';
+function getSeparator() {
+  return document.querySelector('input[name="separator"]:checked').value === 'space' ? ' ' : '\n';
+}
 
-    // 1) enable/disable filename field
-    fileNameInput.disabled = isClipboard;
+function setupOptionToggle(container, storageKey) {
+  const opts     = container.querySelectorAll('.option-opt[data-value]');
+  const leftOpt  = opts[0];
+  const rightOpt = opts[1];
+  const arrow    = container.querySelector('.toggle-arrow');
+  const radio    = container.querySelector('input[type="radio"]');
 
-    // 2) swap button text
-    dmp_btn.textContent     = isClipboard ? 'COPY SELECTED' : 'EXPORT SELECTED';
-    dmp_all_btn.textContent = isClipboard ? 'COPY ALL'      : 'EXPORT ALL';
+  function updateVisuals() {
+    const isRight = radio.value === rightOpt.dataset.value;
+    leftOpt.classList.toggle('active', !isRight);
+    leftOpt.classList.toggle('inactive', isRight);
+    rightOpt.classList.toggle('active', isRight);
+    rightOpt.classList.toggle('inactive', !isRight);
+    arrow.classList.toggle('flipped', isRight);
+  }
+
+  chrome.storage.local.get([storageKey], (result) => {
+    if (result[storageKey]) {
+      radio.value = result[storageKey];
+    }
+    updateVisuals();
+    container.dispatchEvent(new Event('change'));
   });
+
+  leftOpt.addEventListener('click', () => {
+    radio.value = leftOpt.dataset.value;
+    chrome.storage.local.set({ [storageKey]: radio.value });
+    updateVisuals();
+    container.dispatchEvent(new Event('change'));
+  });
+
+  rightOpt.addEventListener('click', () => {
+    radio.value = rightOpt.dataset.value;
+    chrome.storage.local.set({ [storageKey]: radio.value });
+    updateVisuals();
+    container.dispatchEvent(new Event('change'));
+  });
+}
+
+setupOptionToggle(outputToggle, 'outputMode');
+setupOptionToggle(separatorToggle, 'separator');
+
+outputToggle.addEventListener('change', () => {
+  const isClipboard = outputToggle.querySelector('input[type="radio"]').value === 'clipboard';
+  fileNameInput.disabled = isClipboard;
+  dmp_btn.textContent     = isClipboard ? 'COPY SELECTED' : 'EXPORT SELECTED';
+  dmp_all_btn.textContent = isClipboard ? 'COPY ALL'      : 'EXPORT ALL';
 });
 
 
@@ -129,7 +169,7 @@ chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT}, tabs => {
 
 // helper to create a .txt and download
 function downloadTabs(tabs, file_name) {
-  const text = tabs.map(tab => tab.url).join('\n');
+  const text = tabs.map(tab => tab.url).join(getSeparator());
   const blob = new Blob([text], {type: 'text/plain'});
   if (textFile) window.URL.revokeObjectURL(textFile);
   textFile = window.URL.createObjectURL(blob);
@@ -148,7 +188,7 @@ function downloadTabs(tabs, file_name) {
 
 // helper to copy URLs to clipboard
 function copyToClipboard(tabs) {
-  const text = tabs.map(t => t.url).join('\n');
+  const text = tabs.map(t => t.url).join(getSeparator());
   
   // Show copying status
   showCopyingStatus();
@@ -213,7 +253,7 @@ function dumpAll() {
 function readFileToArray(file) {
   return new Promise((res, rej) => {
     const reader = new FileReader();
-    reader.onload = e => res(e.target.result.split('\n'));
+    reader.onload = e => res(e.target.result.split(getSeparator()));
     reader.onerror = rej;
     reader.readAsText(file);
   });
