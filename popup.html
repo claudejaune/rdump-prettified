@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>RDUMP_v0.6</title>
+    <title>RDUMP_v0.7</title>
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
@@ -24,25 +24,38 @@
 
       <div id="all_tabs"></div>
 
-      <!-- separator toggle -->
-      <div class="option-toggle" id="separator-toggle">
-        <span class="toggle-corner-label">Separator</span>
-        <span class="option-opt active" data-value="newline">Newline</span>
-        <span class="toggle-arrow"></span>
-        <span class="option-opt inactive" data-value="space">Space</span>
-        <input type="radio" name="separator" value="newline" checked style="display:none">
+      <div class="input-wrap">
+        <span class="corner-label">URL list</span>
+        <div class="cyber-dropdown" id="separator-select" data-storage="separator">
+          <div class="cyber-dd-selected" tabindex="0">
+            <span class="cyber-dd-text">Newline separated</span>
+            <span class="cyber-dd-arrow"></span>
+          </div>
+          <div class="cyber-dd-menu">
+            <div class="cyber-dd-option" data-value="newline" data-text="Newline separated" data-prefix="URL list: ">Newline separated</div>
+            <div class="cyber-dd-option" data-value="space" data-text="Space separated" data-prefix="URL list: ">Space separated</div>
+          </div>
+        </div>
       </div>
 
-      <!-- output mode toggle -->
-      <div class="option-toggle" id="output-toggle">
-        <span class="toggle-corner-label">URL List</span>
-        <span class="option-opt active" data-value="file">Save</span>
-        <span class="toggle-arrow"></span>
-        <span class="option-opt inactive" data-value="clipboard">Copy</span>
-        <input type="radio" name="output_mode" value="file" checked style="display:none">
+      <div class="input-wrap">
+        <span class="corner-label">Output</span>
+        <div class="cyber-dropdown" id="output-select" data-storage="outputMode">
+          <div class="cyber-dd-selected" tabindex="0">
+            <span class="cyber-dd-text">Save to File</span>
+            <span class="cyber-dd-arrow"></span>
+          </div>
+          <div class="cyber-dd-menu">
+            <div class="cyber-dd-option" data-value="file" data-text="Save to File" data-prefix="Output: ">Save to File</div>
+            <div class="cyber-dd-option" data-value="clipboard" data-text="Copy to Clipboard" data-prefix="Output: ">Copy to Clipboard</div>
+          </div>
+        </div>
       </div>
 
-      <input id="file_name" type="text" value="rdump-tabs.txt" placeholder="DEST_FILENAME (REQUIRED IF SAVING TO FILE)" required/>
+      <div class="input-wrap">
+        <span class="corner-label">Filename</span>
+        <input id="file_name" type="text" value="rdump-tabs.txt" placeholder="REQUIRED IF SAVING TO FILE" required/>
+      </div>
       <div id="btns">      
         <button id="dmp_btn">EXPORT SELECTED</button>
         <button id="dmp_all_btn">EXPORT ALL</button>

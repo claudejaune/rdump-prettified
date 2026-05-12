@@ -1,7 +1,7 @@
 
 {
   "manifest_version": 3,
-  "version": "0.6",
+  "version": "0.7",
   "name": "rdump",
   "icons": {
     "16": "icons/icon16.png",

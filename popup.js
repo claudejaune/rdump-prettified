@@ -3,11 +3,71 @@ const dmp_btn        = document.getElementById("dmp_btn");
 const all_tabs       = document.getElementById("all_tabs");
 const fileInput      = document.getElementById("fileInput");
 const fileNameInput  = document.getElementById("file_name");
-const outputToggle   = document.getElementById("output-toggle");
-const separatorToggle = document.getElementById("separator-toggle");
 const themeSelect    = document.getElementById("theme-select");
 const statusMessage  = document.getElementById("status-message");
 let textFile = null;
+
+// Custom dropdown helper
+function setupDropdown(id) {
+  const dd = document.getElementById(id);
+  const selected = dd.querySelector('.cyber-dd-selected');
+  const textEl = selected.querySelector('.cyber-dd-text');
+  const menu = dd.querySelector('.cyber-dd-menu');
+  const options = menu.querySelectorAll('.cyber-dd-option');
+  let currentValue = options[0].dataset.value;
+
+  function setValue(value, skipDispatch) {
+    currentValue = value;
+    const opt = menu.querySelector(`[data-value="${value}"]`);
+    if (opt) {
+      textEl.textContent = opt.dataset.text;
+      options.forEach(o => o.classList.toggle('selected', o === opt));
+    }
+    if (!skipDispatch) dd.dispatchEvent(new Event('change'));
+  }
+
+  function open() {
+    options.forEach(opt => {
+      opt.textContent = opt.dataset.prefix + opt.dataset.text;
+    });
+    dd.classList.add('open');
+  }
+
+  function close() {
+    dd.classList.remove('open');
+    textEl.textContent = menu.querySelector('.selected')?.dataset.text || '';
+  }
+
+  selected.addEventListener('click', () => {
+    dd.classList.contains('open') ? close() : open();
+  });
+
+  selected.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dd.classList.contains('open') ? close() : open(); }
+    if (e.key === 'Escape') close();
+  });
+
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      setValue(opt.dataset.value);
+      close();
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dd.contains(e.target)) close();
+  });
+
+  dd._getValue = () => currentValue;
+  dd._setValue = setValue;
+  dd._open = open;
+  dd._close = close;
+
+  return dd;
+}
+
+const separatorSelect = setupDropdown('separator-select');
+const outputSelect   = setupDropdown('output-select');
 
 // keep the same injected style for .tab-item/.tab-label
 const style = document.createElement('style');
@@ -82,63 +142,35 @@ function showStatusMessage(message, type = 'info') {
 }
 
 function showCopyingStatus() {
-  const mode = document.querySelector('input[name="output_mode"]:checked').value;
-  if (mode === 'clipboard') {
+  if (outputSelect._getValue() === 'clipboard') {
     showStatusMessage('Copying to clipboard...', 'info');
   }
 }
 
 function getSeparator() {
-  return document.querySelector('input[name="separator"]:checked').value === 'space' ? ' ' : '\n';
+  return separatorSelect._getValue() === 'space' ? ' ' : '\n';
 }
 
-function setupOptionToggle(container, storageKey) {
-  const opts     = container.querySelectorAll('.option-opt[data-value]');
-  const leftOpt  = opts[0];
-  const rightOpt = opts[1];
-  const arrow    = container.querySelector('.toggle-arrow');
-  const radio    = container.querySelector('input[type="radio"]');
-
-  function updateVisuals() {
-    const isRight = radio.value === rightOpt.dataset.value;
-    leftOpt.classList.toggle('active', !isRight);
-    leftOpt.classList.toggle('inactive', isRight);
-    rightOpt.classList.toggle('active', isRight);
-    rightOpt.classList.toggle('inactive', !isRight);
-    arrow.classList.toggle('flipped', isRight);
-  }
-
-  chrome.storage.local.get([storageKey], (result) => {
-    if (result[storageKey]) {
-      radio.value = result[storageKey];
-    }
-    updateVisuals();
-    container.dispatchEvent(new Event('change'));
-  });
-
-  leftOpt.addEventListener('click', () => {
-    radio.value = leftOpt.dataset.value;
-    chrome.storage.local.set({ [storageKey]: radio.value });
-    updateVisuals();
-    container.dispatchEvent(new Event('change'));
-  });
-
-  rightOpt.addEventListener('click', () => {
-    radio.value = rightOpt.dataset.value;
-    chrome.storage.local.set({ [storageKey]: radio.value });
-    updateVisuals();
-    container.dispatchEvent(new Event('change'));
-  });
-}
-
-setupOptionToggle(outputToggle, 'outputMode');
-setupOptionToggle(separatorToggle, 'separator');
-
-outputToggle.addEventListener('change', () => {
-  const isClipboard = outputToggle.querySelector('input[type="radio"]').value === 'clipboard';
+function updateOutputMode() {
+  const isClipboard = outputSelect._getValue() === 'clipboard';
   fileNameInput.disabled = isClipboard;
   dmp_btn.textContent     = isClipboard ? 'COPY SELECTED' : 'EXPORT SELECTED';
   dmp_all_btn.textContent = isClipboard ? 'COPY ALL'      : 'EXPORT ALL';
+}
+
+chrome.storage.local.get(['separator', 'outputMode'], (result) => {
+  if (result.separator) separatorSelect._setValue(result.separator, true);
+  if (result.outputMode) outputSelect._setValue(result.outputMode, true);
+  updateOutputMode();
+});
+
+separatorSelect.addEventListener('change', () => {
+  chrome.storage.local.set({ separator: separatorSelect._getValue() });
+});
+
+outputSelect.addEventListener('change', () => {
+  chrome.storage.local.set({ outputMode: outputSelect._getValue() });
+  updateOutputMode();
 });
 
 
@@ -208,7 +240,7 @@ function copyToClipboard(tabs) {
 
 // export selected tabs
 function dump() {
-  const mode = document.querySelector('input[name="output_mode"]:checked').value;
+  const mode = outputSelect._getValue();
   const selected = Array.from(document.querySelectorAll('input[name="tabs"]:checked'))
     .map(cb => JSON.parse(cb.value));
 
@@ -232,7 +264,7 @@ function dump() {
 
 // export all tabs
 function dumpAll() {
-  const mode = document.querySelector('input[name="output_mode"]:checked').value;
+  const mode = outputSelect._getValue();
   
   if (mode === 'file' && !fileNameInput.value.trim()) {
     showStatusMessage('Please enter a filename to save.', 'error');
