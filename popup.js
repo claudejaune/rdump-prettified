@@ -285,7 +285,7 @@ function dumpAll() {
 function readFileToArray(file) {
   return new Promise((res, rej) => {
     const reader = new FileReader();
-    reader.onload = e => res(e.target.result.split(getSeparator()));
+    reader.onload = e => res(e.target.result.split(/[\s]+/).filter(Boolean));
     reader.onerror = rej;
     reader.readAsText(file);
   });
