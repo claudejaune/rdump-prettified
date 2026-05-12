@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-DIST="dist"
+DIST="rdump"
 
 rm -rf "$DIST"
 mkdir -p "$DIST/icons"
