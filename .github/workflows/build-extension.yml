@@ -1,0 +1,62 @@
+name: Build and release extension
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build extension package
+        run: bash release.sh
+
+      - name: Derive release version
+        id: version
+        run: |
+          manifest_version="$(python3 -c 'import json; print(json.load(open("manifest.json"))["version"])')"
+          release_version="$manifest_version"
+
+          case "$manifest_version" in
+            *.*.*) ;;
+            *.*) release_version="${manifest_version}.0" ;;
+          esac
+
+          echo "manifest_version=$manifest_version" >> "$GITHUB_OUTPUT"
+          echo "release_version=$release_version" >> "$GITHUB_OUTPUT"
+          echo "tag_name=v$release_version" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.version.outputs.tag_name }}
+          RELEASE_VERSION: ${{ steps.version.outputs.release_version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -f "$TAG_NAME" "$GITHUB_SHA"
+          git push --force origin "refs/tags/$TAG_NAME"
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release edit "$TAG_NAME" \
+              --title "$TAG_NAME" \
+              --notes "Automated build for $TAG_NAME from ${GITHUB_SHA}."
+            gh release upload "$TAG_NAME" rdump.zip --clobber
+          else
+            gh release create "$TAG_NAME" rdump.zip \
+              --target "$GITHUB_SHA" \
+              --title "$TAG_NAME" \
+              --notes "Automated build for $TAG_NAME from ${GITHUB_SHA}."
+          fi
