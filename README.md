@@ -8,7 +8,7 @@ This Chrome/Edge/Brave extension has two features:
 
 I use this for sharing and/or saving URLs when researching a topic.
 
-Sometimes I feed that list to my URL to markdown converter (coming soon!) and hand it over to my coding agents as documentation. Your only limited by your imagination.
+Sometimes I feed that list to my URL to markdown converter (coming soon!) and hand it over to my coding agents as documentation. Your're only limited by your imagination.
 
 ## How to use
 
